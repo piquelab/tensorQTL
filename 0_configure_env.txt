@@ -1,0 +1,28 @@
+#### Grab Cindy's environment ####
+conda env create --name tensorqtl_p3.11_env --file=/wsu/home/groups/piquelab/cindy/tensorqtl.environment.yaml
+conda activate tensorqtl_p3.11_env
+
+### Additional functions ###
+pip3 install 'rpy2<=3.5.12'
+conda config --add channels conda-forge
+conda config --set channel_priority strict 
+conda install r-essentials
+
+R
+
+``` {r} ```
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("qvalue")
+library(qvalue)
+packageVersion("qvalue")
+```
+
+export LD_LIBRARY_PATH=/wsu/el7/groups/piquelab/R/4.3.2/lib64/R/lib:$LD_LIBRARY_PATH
+
+python3
+from rpy2.robjects.packages import importr
+
+python3 -m tensorqtl --help
+### All good to go! ###
