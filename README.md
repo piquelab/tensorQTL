@@ -197,16 +197,16 @@ This script operates on **cis permutation** output (not cis_nominal). It:
 3. Applies cross-gene FDR via `p.adjust()`
 4. Calls eGenes at defined threshold (basic: FDR 0.10)
 5. Writes:
-        - QQ plot per condition
-        - Bar chart of eGene counts across conditions
-        - Per-condition eGene lists
-        - Plain-text summary report
+   -- QQ plot per condition
+   -- Bar chart of eGene counts across conditions
+   -- Per-condition eGene lists
+   -- Plain-text summary report
 
 A list of unique significant eGenes (FDR < 0.10, any condition) is written to:
 ```
 tensorqtl_output_cis/unique_significant_egenes.txt
 ```
-*Note*
+*Note:*
 tensorQTL's cis permutation mode corrects for multiple testing **within each gene** using a beta-approximation to the permutation p-value (`pval_beta`). The FDR script applies a p-val adjustment across all genes within a condition for calling eGenes.
 
 | Step | What it corrects for |
@@ -233,10 +233,15 @@ eQTL_mapping/
 │   │       └── <CONDITION>_cis.cis_nominal_pairs.*.txt
 │   └── tensorqtl_output_cis/
 │       ├── <CONDITION>_cis.cis_qtl.txt.gz
+│       ├── unique_significant_egenes.txt
 │       └── analysis/
-│           ├── eQTL_summary_fdr.txt
-│           ├── FDR_ANALYSIS_SUMMARY.txt
+│           ├── eGene_summary.txt
+│           ├── SUMMARY.txt
+│           ├── eGene_lists/
+│                 └── eGenes_<CONDITION>.txt
 │           └── figures/
+│                 ├── QQ_<CONDITION>.txt
+│                 └── eGene_counts.png
 ├── GxP-eQTL_<COND>_qnorm.bed.gz
 ├── GxP-eQTL_<COND>_qnorm.sorted.bed.gz
 └── covariates/
