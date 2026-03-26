@@ -25,12 +25,14 @@ PLINK_PREFIX="${BASE}/GxP-eQTL_DNA_genotypes_filtered_SNPs_noChr"
 COND_TSV="${BASE}/tensorqtl_conditions.tsv"
 
 ### Output directory for tensorQTL results
-OUT_DIR="${BASE}/tensorqtl_output_cis-nominal_SV15_100kb"
+OUT_DIR="${BASE}/tensorqtl_output"
 
 ### tensorQTL run parameters
 MODE="cis_nominal"        # tensorQTL mode (e.g. cis, cis_nominal, cis_independent, interaction, etc.)
 FDR=0.1                   # FDR threshold
 WINDOW=100000             # cis-window in bp
+
+OUT_DIR="${OUT_DIR}/${MODE}"
 
 ### Conda environment name
 CONDA_ENV="tensorqtl_p3.11"
