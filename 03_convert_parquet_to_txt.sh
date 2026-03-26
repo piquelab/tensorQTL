@@ -8,10 +8,10 @@
 BASE_DIR="/rs/rs_grp_gxp/RNAseq_analysis/GxP_20250730/eQTL_mapping/tensor"
 
 ### Directory containing .parquet files to convert
-INPUT_DIR="${BASE_DIR}/tensorqtl_output/cis_nominal"
+INPUT_DIR="${BASE_DIR}/tensorqtl_output_cis_nominal"
 
 ### Directory to write .txt output files
-OUTPUT_DIR="${BASE_DIR}/txt_files"
+OUTPUT_DIR="${INPUT_DIR}/txt_files"
 
 ### Output file delimiter (use $'\t' for tab, ',' for CSV, etc.)
 DELIMITER=$'\t'
