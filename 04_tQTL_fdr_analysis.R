@@ -2,23 +2,6 @@
 # =============================================================================
 # 04_tQTL_fdr_analysis.R
 # Post-processing of tensorQTL cis (permutation) results
-#
-# Input:  tensorQTL cis permutation output — one file per condition:
-#           <input_dir>/<CONDITION>_cis.cis_qtl.txt.gz
-#
-# What this script does:
-#   1. Loads per-condition cis permutation results
-#   2. Selects the best available p-value (pval_beta > pval_perm > pval_nominal)
-#   3. Applies cross-gene FDR correction via p.adjust()
-#   4. Calls eGenes at a user-defined FDR threshold
-#   5. Writes:
-#        - QQ plot per condition
-#        - Bar chart of eGene counts across conditions
-#        - Per-condition eGene lists
-#        - Plain-text summary report
-#
-# Run:
-#   Rscript 04_tQTL_fdr_analysis.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -31,8 +14,8 @@ suppressPackageStartupMessages({
 # CONFIGURATION — edit these variables before running
 # =============================================================================
 
-input_dir  <- "/rs/rs_grp_gxp/RNAseq_analysis/GxP_20250730/eQTL_mapping/tensor/tensorqtl_output_cis_SV15_100kb"
-output_dir <- file.path(input_dir, "fdr_analysis")
+input_dir  <- "/rs/rs_grp_gxp/RNAseq_analysis/GxP_20250730/eQTL_mapping/tensor/tensorqtl_output_cis"
+output_dir <- file.path(input_dir, "analysis")
 
 # FDR threshold for eGene calling
 fdr_threshold <- 0.10
