@@ -134,15 +134,6 @@ What it does:
 
 The condition label is extracted automatically by stripping `BED_PREFIX` and `BED_SUFFIX` from each BED filename.
 
-## Condition manifest format
-
-`tensorqtl_conditions.tsv`
-```
-condition       bed                                          covariates
-BPA_100nM_24    /path/to/GxP-eQTL_BPA_100nM_24_...sorted.bed.gz    /path/to/covariates/...txt
-BPA_100nM_6     /path/to/GxP-eQTL_BPA_100nM_6_...sorted.bed.gz     /path/to/covariates/...txt
-...
-```
 ---
 
 ### Step 2 — Submit tensorQTL in cis_nominal (all SNP-gene pairs) and cis (permutations) modes via SLURM
