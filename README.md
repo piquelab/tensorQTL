@@ -22,7 +22,7 @@ VCF (filtered SNPs)
       │
       ├─▶  .parquet → .txt conversion       [03]  ← use for mashr / downstream
       │
-      └─▶  tensorQTL cis (permutation)      [02,  ← use for calling eGenes]
+      └─▶  tensorQTL cis (permutation)      [02]  ← use for calling eGenes
                 │
                 ▼
            FDR correction + eGene summary   [04]
@@ -246,7 +246,7 @@ For exploratory comparisons across conditions, `pval_nominal < 0.001` or FDR < 0
 
 ---
 
-## Directory structure
+## Example irectory structure
 
 ```
 eQTL_mapping/
