@@ -2,7 +2,7 @@
 
 A full eQTL mapping pipeline from genotype VCF to significant eGene calls, using [tensorQTL](https://github.com/broadinstitute/tensorqtl) for GPU-accelerated cis-QTL mapping.
 
-Originally developed for the GxP project (GxP_20250730), but structured to be portable to any study with a similar design: multiple treatment/timepoint conditions, RNA-seq phenotypes, and a shared genotype panel.
+Structured to be portable to any study with a similar design: multiple conditions (treatment, timepoint, cell type, etc.), RNA-seq phenotypes, and a shared genotype panel.
 
 ---
 
@@ -193,16 +193,15 @@ Rscript scripts/04_tQTL_fdr_analysis.R
 
 This script operates on **cis permutation** output (not cis_nominal). It:
 1. Loads `<CONDITION>_cis.cis_qtl.txt.gz` for each condition
-2. Selects the best available p-value (`pval_beta` > `pval_perm` > `pval_nominal`)
-3. Applies cross-gene FDR via `p.adjust()`
-4. Calls eGenes at defined threshold (basic: FDR 0.10)
-5. Writes:
-   -- QQ plot per condition
-   -- Bar chart of eGene counts across conditions
-   -- Per-condition eGene lists
-   -- Plain-text summary report
+2. Applies cross-gene FDR via `p.adjust()`to `pval_beta`
+3. Calls eGenes at defined threshold (basic: FDR 0.10)
+4. Writes:
+* QQ plot per condition
+* Bar chart of eGene counts across conditions
+* Per-condition eGene lists
+* Plain-text summary report
 
-A list of unique significant eGenes (FDR < 0.10, any condition) is written to:
+A list of unique significant eGenes across all conditions is written to:
 ```
 tensorqtl_output_cis/unique_significant_egenes.txt
 ```
@@ -214,7 +213,7 @@ tensorQTL's cis permutation mode corrects for multiple testing **within each gen
 | tensorQTL permutation | Multiple SNPs per gene |
 | `p.adjust(pval_beta, "fdr")` | Multiple genes per condition |
 
-For exploratory comparisons across conditions, `pval_nominal < 0.001` or FDR < 0.10 are reasonable thresholds.
+For exploratory comparisons across conditions, pval_nominal < 0.001 or FDR < 0.10 are reasonable thresholds.
 
 ---
 
