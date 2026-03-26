@@ -32,13 +32,10 @@ MODE="cis_nominal"        # tensorQTL mode (e.g. cis, cis_nominal, cis_independe
 FDR=0.1                   # FDR threshold
 WINDOW=100000             # cis-window in bp
 
-OUT_DIR="${OUT_DIR}/${MODE}"
+OUT_DIR="${OUT_DIR}_${MODE}"
 
 ### Conda environment name
 CONDA_ENV="tensorqtl_p3.11"
-
-### Extra LD_LIBRARY_PATH entries needed (space-separated, or leave empty)
-LD_PATHS="/wsu/el7/groups/piquelab/R/4.3.2/lib64/R/lib"
 
 # =============================================================================
 # END OF USER CONFIGURATION
@@ -52,11 +49,9 @@ mkdir -p "${OUT_DIR}"
 ### Environment
 module purge
 module load plink/2.0
+export PATH=/wsu/el7/groups/piquelab/R/4.3.2/bin:${PATH}
+export LD_LIBRARY_PATH=/wsu/el7/groups/piquelab/R/4.3.2/lib64/R/lib:${LD_LIBRARY_PATH:-}
 source activate "${CONDA_ENV}"
-
-if [[ -n "${EXTRA_LD_PATHS}" ]]; then
-  export LD_LIBRARY_PATH="${EXTRA_LD_PATHS}:${LD_LIBRARY_PATH:-}"
-fi
 
 python3 -m tensorqtl --help >/dev/null 2>&1 \
   || { echo "ERROR: tensorQTL not found in environment '${CONDA_ENV}'"; exit 1; }
