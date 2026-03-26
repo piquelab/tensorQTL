@@ -18,7 +18,7 @@ VCF (filtered SNPs)
   Sorted phenotype BEDs + covariate files   [01]
       │
       ▼
-  tensorQTL (SLURM array)       [02]
+  tensorQTL (SLURM array)                   [02]
       │
       ├─▶  tensorQTL cis_nominal            [02]  
       │         │
@@ -194,10 +194,10 @@ This script operates on **cis permutation** output (not cis_nominal). It:
 1. Loads `<CONDITION>_cis.cis_qtl.txt.gz` for each condition
 2. Selects the best available p-value (`pval_beta` > `pval_perm` > `pval_nominal`)
 3. Applies cross-gene FDR via `p.adjust()`
-4. Counts eGenes at multiple thresholds (FDR 0.05/0.10/0.20, Bonferroni, nominal)
+4. Counts eGenes at defined thresholds (basic: FDR 0.10)
 5. Writes QQ plots, method comparison bar charts, and a plain-text summary
 
-**Outputs** (in `tensorqtl_output_cis_SV15_100kb/analysis_results_fdr/`):
+**Outputs** (in `tensorqtl_output_cis/analysis_results_fdr/`):
 ```
 eQTL_summary_fdr.txt                    — per-condition eGene counts
 FDR_ANALYSIS_SUMMARY.txt                — overall summary
@@ -207,7 +207,7 @@ figures/pvalue_distributions_<COND>.png
 ```
 A list of unique significant eGenes (FDR < 0.10, any condition) is written to:
 ```
-tensorqtl_output_cis_SV15_100kb/unique_significant_egenes.txt
+tensorqtl_output_cis/unique_significant_egenes.txt
 ```
 
 ---
@@ -229,14 +229,14 @@ SLURM array task IDs map to rows: task 1 = first data row, task 2 = second, etc.
 
 ## Notes on FDR strategy
 
-tensorQTL's cis permutation mode corrects for multiple testing **within each gene** using a beta-approximation to the permutation p-value (`pval_beta`). The FDR script applies a **second-pass FDR** across all genes within a condition — this is an additional step and deliberately conservative.
+tensorQTL's cis permutation mode corrects for multiple testing **within each gene** using a beta-approximation to the permutation p-value (`pval_beta`). The FDR script applies a p-val adjustment across all genes within a condition for calling eGenes.
 
 | Step | What it corrects for |
 |------|----------------------|
 | tensorQTL permutation | Multiple SNPs per gene |
 | `p.adjust(pval_beta, "fdr")` | Multiple genes per condition |
 
-For exploratory comparisons across conditions, `pval_nominal < 0.001` or FDR < 0.10 are reasonable thresholds; for a final significant eGene list, use FDR < 0.05.
+For exploratory comparisons across conditions, `pval_nominal < 0.001` or FDR < 0.10 are reasonable thresholds.
 
 ---
 
@@ -247,22 +247,22 @@ eQTL_mapping/
 ├── scripts/
 │   └── 00, 01, 02, 03...
 ├── tensor/
-│   ├── GxP-eQTL_DNA_genotypes_filtered_SNPs_noChr.{pgen,pvar,psam}
+│   ├── genotypes_filtered_noChr.{pgen,pvar,psam}
 │   ├── tensorqtl_conditions.tsv
-│   ├── tensorqtl_output_cis-nominal_SV15_100kb/
+│   ├── tensorqtl_output_cis-nominal/
 │   │   ├── <CONDITION>_cis.cis_nominal_pairs.*.parquet
 │   │   └── txt_files/
 │   │       └── <CONDITION>_cis.cis_nominal_pairs.*.txt
-│   └── tensorqtl_output_cis_SV15_100kb/
+│   └── tensorqtl_output_cis/
 │       ├── <CONDITION>_cis.cis_qtl.txt.gz
 │       └── analysis_results_fdr/
 │           ├── eQTL_summary_fdr.txt
 │           ├── FDR_ANALYSIS_SUMMARY.txt
 │           └── figures/
-├── GxP-eQTL_<COND>_qnorm_genotypePC_COMBATNone_corrected.bed.gz
-├── GxP-eQTL_<COND>_qnorm_genotypePC_COMBATNone_corrected.sorted.bed.gz
+├── GxP-eQTL_<COND>_qnorm_genotypePC.bed.gz
+├── GxP-eQTL_<COND>_qnorm_genotypePC.sorted.bed.gz
 └── covariates/
-    └── GxP-eQTL_<COND>-SV1-15.covariates-COMBATNone-FastQTL.txt
+    └── GxP-eQTL_<COND>_SVstxt
 ```
 
 ---
