@@ -68,7 +68,7 @@ SORTED_SUFFIX="_qnorm_genotypePC_COMBATNone_corrected.sorted.bed.gz"
 
 COV_PREFIX="GxP-eQTL_"
 COV_SUFFIX="-SV1-15.covariates-COMBATNone-FastQTL.txt"
-COV_PATTERN="${BASE}/covariates/${COV_PREFIX}*${COV_SUFFIX}"
+COV_PATTERN="${BASE}/covariates/${COV_PREFIX}<COND>${COV_SUFFIX}"
 
 mkdir -p "${TENSOR_DIR}"
 
