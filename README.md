@@ -100,7 +100,7 @@ conda activate tensorqtl_p3.11_env
 export LD_LIBRARY_PATH=/wsu/el7/groups/piquelab/R/4.3.2/lib64/R/lib:$LD_LIBRARY_PATH
 ```
 
-> **Note:** The `LD_LIBRARY_PATH` line is is for the pique group R/4.3.2 which is known to be compatible with all analyses. 
+> **Note:** The `LD_LIBRARY_PATH` line is is for the pique group R/4.3.2 which is known to be compatible with all other modules.
 
 ---
 
