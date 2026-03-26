@@ -22,7 +22,7 @@ VCF (filtered SNPs)
       │
       ├─▶  .parquet → .txt conversion       [03]  ← use for mashr / downstream
       │
-      └─▶  tensorQTL cis (permutation)      [02, alternate mode]
+      └─▶  tensorQTL cis (permutation)      [02,  ← use for calling eGenes]
                 │
                 ▼
            FDR correction + eGene summary   [04]
@@ -36,9 +36,9 @@ VCF (filtered SNPs)
 |---|--------|-------------|
 | 00 | `00_setup_tensorQTL.sh` | One-time conda environment setup (rpy2, R qvalue) |
 | 01 | `01_tensorQTL.sh` | VCF → PLINK2; build condition manifest; submit SLURM array |
-| 02 | `02_tensorQTL.sbatch` | SLURM array job — one condition per task, cis_nominal mode |
+| 02 | `02_tensorQTL.sbatch` | SLURM array job — one condition per task, run both cis and cis_nominal mode |
 | 03 | `03_convert_parquet_to_txt.sh` | Convert cis_nominal parquet output to tab-delimited text |
-| 04 | `04_tQTL_fdr_analysis.R` | Load cis (permutation) results; apply FDR; plots + summary |
+| 04 | `04_tQTL_fdr_analysis.R` | Load cis (permuted) results; apply FDR; plots + summary |
 
 ---
 
@@ -70,13 +70,14 @@ BiocManager::install("qvalue")
 
 | File | Description |
 |------|-------------|
-| `*_noChr.vcf.gz` | Filtered, biallelic SNP VCF (no `chr` prefix on contigs) |
-| `GxP-eQTL_<COND>_qnorm_genotypePC_COMBATNone_corrected.bed.gz` | Quantile-normalised, batch-corrected phenotype BED per condition |
-| `covariates/GxP-eQTL_<COND>-SV1-15.covariates-COMBATNone-FastQTL.txt` | Covariate matrix per condition (genotype PCs + PEER/SVs) |
+| `*.vcf.gz` | Filtered, biallelic SNP VCF (no `chr` prefix on contigs) |
+| `prefix_<COND>_suffix.bed.gz` | Quantile-normalised, batch-corrected phenotype BED per condition |
+| `covariates/prefix_<COND>_suffix.txt` | Covariate matrix per condition (genotype PCs + PEER/SVs) |
 
 ---
 
 ## Setup (one-time)
+Recommend running interactively.
 
 ```bash
 bash scripts/00_setup_tensorQTL.sh
@@ -96,7 +97,7 @@ conda activate tensorqtl_p3.11_env
 export LD_LIBRARY_PATH=/wsu/el7/groups/piquelab/R/4.3.2/lib64/R/lib:$LD_LIBRARY_PATH
 ```
 
-> **Note:** The `LD_LIBRARY_PATH` line is cluster-specific (WSU). Update the path if your R installation is elsewhere.
+> **Note:** The `LD_LIBRARY_PATH` line is is for the pique group R/4.3.2 which is known to be compatible with all analyses. 
 
 ---
 
@@ -124,14 +125,15 @@ What it does:
 | `VCF` | Filtered biallelic SNP VCF (no `chr` prefix) | `study_genotypes.vcf.gz` |
 | `BED_PREFIX` | Filename prefix before the condition label | `"study_"` |
 | `BED_SUFFIX` | Filename suffix after the condition label | `"_qnorm_corrected.bed.gz"` |
-| `COV_PATTERN` | Full path to covariate file; use `<COND>` as a placeholder for the condition label | `"covariates/study_<COND>_PCs.txt"` |
+| `COV_PREFIX` | Filename prefix before the condition label | `"study_"` |
+| `COV_SUFFIX` | Filename suffix after the condition label | `"_10-SVs.txt"` |
 | `SORTED_SUFFIX` | Suffix for sorted BED copies (usually matches `BED_SUFFIX` with `.sorted` inserted) | `"_qnorm_corrected.sorted.bed.gz"` |
 
-The condition label is extracted automatically by stripping `BED_PREFIX` and `BED_SUFFIX` from each BED filename, then substituted into `COV_PATTERN` wherever `<COND>` appears.
+The condition label is extracted automatically by stripping `BED_PREFIX` and `BED_SUFFIX` from each BED filename.
 
 ---
 
-### Step 2 — tensorQTL cis_nominal (runs via SLURM)
+### Step 2 — Submit tensorQTL in cis_nominal (all SNP-gene pairs) and cis (permutations) modes via SLURM
 
 `02_tensorQTL.sbatch` runs automatically as a SLURM array from Step 1.  
 Each task maps to one row in `tensorqtl_conditions.tsv` and runs:
@@ -140,6 +142,14 @@ Each task maps to one row in `tensorqtl_conditions.tsv` and runs:
 python3 -m tensorqtl <plink_prefix> <pheno_bed> <out_prefix> \
   --covariates <cov_file> \
   --mode cis_nominal \
+  --fdr 0.1 \
+  --window 100000
+```
+AND
+```
+python3 -m tensorqtl <plink_prefix> <pheno_bed> <out_prefix> \
+  --covariates <cov_file> \
+  --mode cis \
   --fdr 0.1 \
   --window 100000
 ```
@@ -189,7 +199,7 @@ Converts all `.parquet` files in the cis_nominal output directory to tab-delimit
 This script operates on **cis permutation** output (not cis_nominal). It:
 1. Loads `<CONDITION>_cis.cis_qtl.txt.gz` for each condition
 2. Selects the best available p-value (`pval_beta` > `pval_perm` > `pval_nominal`)
-3. Applies cross-gene FDR and Bonferroni correction via `p.adjust()`
+3. Applies cross-gene FDR via `p.adjust()`
 4. Counts eGenes at multiple thresholds (FDR 0.05/0.10/0.20, Bonferroni, nominal)
 5. Writes QQ plots, method comparison bar charts, and a plain-text summary
 
