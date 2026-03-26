@@ -18,14 +18,17 @@ VCF (filtered SNPs)
   Sorted phenotype BEDs + covariate files   [01]
       │
       ▼
-  tensorQTL cis_nominal (SLURM array)       [02]
+  tensorQTL (SLURM array)       [02]
       │
-      ├─▶  .parquet → .txt conversion       [03]  ← use for mashr / downstream
+      ├─▶  tensorQTL cis_nominal            [02]  
+      │         │
+      │         ▼
+      │    .parquet → .txt conversion       [03]  ← use for mashr / downstream
       │
-      └─▶  tensorQTL cis (permutation)      [02]  ← use for calling eGenes
+      └─▶  tensorQTL cis (permutation)      [02]  
                 │
                 ▼
-           FDR correction + eGene summary   [04]
+           FDR correction + eGene summary   [04]  ← use for calling eGenes
 ```
 
 ---
@@ -141,19 +144,10 @@ Each task maps to one row in `tensorqtl_conditions.tsv` and runs:
 ```
 python3 -m tensorqtl <plink_prefix> <pheno_bed> <out_prefix> \
   --covariates <cov_file> \
-  --mode cis_nominal \
-  --fdr 0.1 \
-  --window 100000
+  --mode <cis_nominal> \
+  --fdr <0.1> \
+  --window <100000>
 ```
-AND
-```
-python3 -m tensorqtl <plink_prefix> <pheno_bed> <out_prefix> \
-  --covariates <cov_file> \
-  --mode cis \
-  --fdr 0.1 \
-  --window 100000
-```
-
 **Key parameters:**
 
 | Parameter | Value | Notes |
@@ -162,10 +156,10 @@ python3 -m tensorqtl <plink_prefix> <pheno_bed> <out_prefix> \
 | `--window` | 100,000 bp | ±100 kb from TSS |
 | `--fdr` | 0.1 | Passed to tensorQTL's internal FDR step |
 
-**Outputs** (one set per condition in `tensorqtl_output_cis-nominal_SV15_100kb/`):
+**Outputs** (one set per condition in `tensorqtl_output/{mode}`):
 ```
 <CONDITION>_cis.cis_nominal_pairs.<chunk>.parquet
-<CONDITION>_cis.cis_qtl_thresholds.txt.gz
+<CONDITION>_cis.cis_qtl.txt.gz
 ```
 
 To monitor jobs:
@@ -193,7 +187,7 @@ Converts all `.parquet` files in the cis_nominal output directory to tab-delimit
 ### Step 4 — FDR correction and eGene summary (cis permutation results)
 
 ```bash
-/path/to/Rscript scripts/04_tQTL_fdr_analysis.R
+Rscript scripts/04_tQTL_fdr_analysis.R
 ```
 
 This script operates on **cis permutation** output (not cis_nominal). It:
@@ -250,6 +244,8 @@ For exploratory comparisons across conditions, `pval_nominal < 0.001` or FDR < 0
 
 ```
 eQTL_mapping/
+├── scripts/
+│   └── 00, 01, 02, 03...
 ├── tensor/
 │   ├── GxP-eQTL_DNA_genotypes_filtered_SNPs_noChr.{pgen,pvar,psam}
 │   ├── tensorqtl_conditions.tsv
